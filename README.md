@@ -65,7 +65,7 @@ need to use an adapter for another type of product.
 
 ## Solution
 
-To solve the problem of tightly coupled dependencies, the IoC Container pattern is used. The idea behind this approach
+IoC Container pattern helps to solve the problem of tightly coupled dependencies. The idea behind this approach
 is that a class does not depend on another class directly, but depends on an interface. Thus, if there is a need to
 replace one of the dependencies, it is enough for the declare dependency with the same interfaces into the IoC Container.
 

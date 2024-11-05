@@ -1,0 +1,48 @@
+{
+  "name": "friendly-di",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "exports": {
+    ".": {
+      "import": "./lib/esm/index.mjs",
+      "require": "./lib/cjs/index.cjs"
+    }
+  },
+  "main": "./lib/cjs/index.cjs",
+  "module": "./lib/esm/index.mjs",
+  "types": "./dist-types/index.d.ts",
+  "scripts": {
+    "build": "node scripts.build --mode=production && rimraf lib/esm/tests && rimraf lib/cjs/tests && rimraf dist-types/tests",
+    "format": "npm run format:package && npm run format:prettier && npm run format:code",
+    "format:code": "eslint . --fix",
+    "format:package": "sort-package-json",
+    "format:prettier": "prettier --write \"src/**/*.{ts,tsx,json}\"",
+    "lint": "npm run lint:ts && npm run lint:code",
+    "lint:code": "eslint .",
+    "lint:commit": "commitlint -e",
+    "lint:ts": "tsc --noEmit",
+    "pre-commit": "lint-staged",
+    "start": "node scripts.example",
+    "test": "node --no-experimental-fetch scripts.tests.js",
+    "test:watch": "node scripts.tests.js --watch"
+  },
+  "devDependencies": {
+    "@rockpack/codestyle": "5.0.0-next.3",
+    "@rockpack/compiler": "5.0.0-next.3",
+    "@rockpack/tester": "5.0.0-next.3",
+    "@rockpack/tsconfig": "5.0.0-next.3",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "husky": "9.1.6",
+    "lint-staged": "15.2.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "reflect-metadata": "0.2.2",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.5"
+  }
+}

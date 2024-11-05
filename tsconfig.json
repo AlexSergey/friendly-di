@@ -1,0 +1,14 @@
+{
+  "extends": "@rockpack/tsconfig",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "types": [
+      "reflect-metadata",
+      "jest"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "exclude": ["./node_modules/**/*"],
+  "include": ["./src/**/*", "./example/**/*"]
+}

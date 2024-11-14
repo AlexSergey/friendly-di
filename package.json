@@ -1,10 +1,21 @@
 {
   "name": "friendly-di",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "",
+  "description": "Friendly DI is light and fast Inversion Of Control Container based on Reflect metadata inspired by Angular and Nest DI systems.",
+  "keywords": [
+    "nestjs",
+    "di",
+    "dependency injection",
+    "dependency inversion",
+    "inversion of control",
+    "container ioc",
+    "javascript",
+    "node",
+    "typescript"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/AlexSergey/friendly-di",
+  "author": "Aleksandrov Sergey <gooddev.sergey@gmail.com> (https://github.com/AlexSergey/friendly-di)",
   "exports": {
     ".": {
       "import": "./lib/esm/index.mjs",
@@ -24,6 +35,7 @@
     "lint:code": "eslint .",
     "lint:commit": "commitlint -e",
     "lint:ts": "tsc --noEmit",
+    "production": "npm run lint && npm publish --access public",
     "pre-commit": "lint-staged",
     "start": "node scripts.example",
     "test": "node --no-experimental-fetch scripts.tests.js",

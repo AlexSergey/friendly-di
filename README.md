@@ -153,8 +153,7 @@ app.run() // 'new product 1', 'new product 2', 'new product 3'
 
 ### TSX issue
 
-Currently, **friendly-di** has problems with [tsx](https://github.com/privatenumber/tsx) usage. If you need use **friendly-di** in NodeJS project please use *
-ts-node/esm* loader:
+Currently, **friendly-di** has problems with [tsx](https://github.com/privatenumber/tsx) usage. If you need use **friendly-di** in Node.js project please use *ts-node/esm* loader:
 
 ```shell
 node --loader ts-node/esm index.ts

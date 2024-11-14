@@ -35,7 +35,7 @@
     "lint:code": "eslint .",
     "lint:commit": "commitlint -e",
     "lint:ts": "tsc --noEmit",
-    "production": "npm run lint && npm publish --access public",
+    "production": "npm run lint && npm run build && npm publish --access public",
     "pre-commit": "lint-staged",
     "start": "node scripts.example",
     "test": "node --no-experimental-fetch scripts.tests.js",

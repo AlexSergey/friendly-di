@@ -1,6 +1,9 @@
 import type { Dependency } from './types';
 
-import { counter } from './counter';
+export const counter = (
+  (c) => () =>
+    c++
+)(0);
 
 export function Injectable(): (target: Dependency) => void {
   return function (target: Dependency): void {

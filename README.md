@@ -14,56 +14,7 @@
 
 ***
 
-## Problematics
-
-In object-oriented programming, the Dependency Inversion Principle plays a key role in developing clean, extensible, and
-easily testable code.
-
-Suppose we have a simple set of classes that interact with each other:
-
-- *A user can order products in our store.*
-
-How it might look:
-
-We have 3 classes:
-
-[UserService] ---> [OrderService] ---> [ProductService]
-
-```ts
-class UserService {
-  constructor() {
-    this.orderService = new OrderService();
-  }
-
-  getUserOrders() {
-    return this.orderService.getOrdersForUser();
-  }
-}
-
-class OrderService {
-  constructor() {
-    this.productService = new ProductService();
-  }
-
-  getOrdersForUser() {
-    return this.productService.getProducts();
-  }
-}
-
-class ProductService {
-  getProducts() {
-    return ['product 1', 'product 2', 'product 3'];
-  }
-}
-```
-
-This code has a strong coupling between classes. We specify dependencies directly. This approach makes it difficult to
-test this code if we need to replace, for example, a service that communicates with a database, or replace a class if we
-need to use an adapter for another type of product.
-
-***
-
-## Solution
+## How it works
 
 IoC Container pattern helps to solve the problem of tightly coupled dependencies. The idea behind this approach
 is that a class does not depend on another class directly, but depends on an interface. Thus, if there is a need to
@@ -92,63 +43,31 @@ npm i friendly-di reflect-metadata
 2. Add 2 lines in *tsconfig.json*:
 
 ```json
+{
+  "compilerOptions": {
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": true
+  }
+}
+
 ```
 
 3. Add Injectable decorator to each class and declare dependencies in constructor:
 
+*! Important:*
+
+It is recommended to containerize the root of your application to comply with the [composition root](https://blog.ploeh.dk/2011/07/28/CompositionRoot/)
+to avoid the [service locator](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/) anti-pattern.
+In this example *class App* is our composition root.
+
 ```ts
-import { Injectable } from 'friendly-di';
-
-@Injectable()
-export class UserService {
-  constructor(private orderService: OrderService) {}
-
-  getUserOrders() {
-    return this.orderService.getOrdersForUser();
-  }
-}
-
-@Injectable()
-class OrderService {
-  constructor(private productService: ProductService) {}
-
-  getOrdersForUser() {
-    return this.productService.getProducts();
-  }
-}
+import 'reflect-metadata';
+import { Injectable, Container } from 'friendly-di';
 
 @Injectable()
 class ProductService {
   getProducts() {
     return ['product 1', 'product 2', 'product 3'];
-  }
-}
-```
-
-4. Declare container and root class:
-
-```ts
-const userService = new Container(UserService).compile();
-
-userService.getUserOrders() // 'product 1', 'product 2', 'product 3'
-```
-
-## Use Cases
-
-Let's override ProductService in our code:
-
-```ts
-import { Injectable } from 'friendly-di';
-
-@Injectable()
-export class UserService {
-  constructor(private orderService: OrderService) {
-  }
-
-  getUserOrders() {
-    return this.orderService.getOrdersForUser();
   }
 }
 
@@ -163,14 +82,40 @@ class OrderService {
 }
 
 @Injectable()
-class ProductService {
-  getProducts() {
-    return ['product 1', 'product 2', 'product 3'];
+export class UserService {
+  constructor(private orderService: OrderService) {
+  }
+
+  getUserOrders() {
+    return this.orderService.getOrdersForUser();
+  }
+}
+
+
+@Injectable()
+export class App {
+  constructor(private userService: UserService) {
+  }
+
+  run() {
+    return this.userService.getUserOrders();
   }
 }
 ```
 
-1. We need to make mocked class with the same interface:
+4. Declare container and root class:
+
+```ts
+const app = new Container(App).compile();
+
+app.run() // 'product 1', 'product 2', 'product 3'
+```
+
+## Use Cases
+
+If we need to mock nested dependencies we should:
+
+1. Make mock-class with similar interface:
 
 ```ts
 @Injectable()
@@ -184,11 +129,11 @@ class MockProductService {
 2. When we declare container with root we also can replace classes:
 
 ```ts
-const userService = new Container(UserService)
+const app = new Container(App)
   .replace(ProductService, MockProductService)
   .compile();
 
-userService.getUserOrders() // 'new product 1', 'new product 2', 'new product 3'
+app.run() // 'new product 1', 'new product 2', 'new product 3'
 ```
 
 *replace* method receives 2 arguments: Replaceable class, Class to be replaced.
@@ -196,12 +141,65 @@ userService.getUserOrders() // 'new product 1', 'new product 2', 'new product 3'
 Method *replace* is chainable, so we can make replace many times:
 
 ```ts
-const userService = new Container(UserService)
+const app = new Container(App)
   .replace(ProductService, MockProductService)
   .replace(OrderService, MockOrderService)
   .compile();
 
-userService.getUserOrders() // 'new product 1', 'new product 2', 'new product 3'
+app.run() // 'new product 1', 'new product 2', 'new product 3'
+```
+
+## Limitations
+
+### TSX issue
+
+Currently, **friendly-di** has problems with [tsx](https://github.com/privatenumber/tsx) usage. If you need use **friendly-di** in NodeJS project please use *
+ts-node/esm* loader:
+
+```shell
+node --loader ts-node/esm index.ts
+```
+
+### Interfaces Dependency
+
+**friendly-di** is not support interface as a dependency. Please use classes:
+
+*Wrong*
+
+```ts
+interface ProductServiceInterface {
+  getProducts(): string[];
+}
+@Injectable()
+class OrderService {
+  constructor(private productService: ProductServiceInterface) {
+  }
+
+  getOrdersForUser() {
+    return this.productService.getProducts();
+  }
+}
+```
+
+*Correct*
+
+```ts
+@Injectable()
+class ProductService {
+  getProducts() {
+    return ['product 1', 'product 2', 'product 3'];
+  }
+}
+
+@Injectable()
+class OrderService {
+  constructor(private productService: ProductService) {
+  }
+
+  getOrdersForUser() {
+    return this.productService.getProducts();
+  }
+}
 ```
 
 ## Alternatives

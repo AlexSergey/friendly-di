@@ -13,7 +13,7 @@
   },
   "main": "./lib/cjs/index.cjs",
   "module": "./lib/esm/index.mjs",
-  "types": "./dist-types/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
     "build": "node scripts.build --mode=production && rimraf lib/esm/tests && rimraf lib/cjs/tests && rimraf dist-types/tests",
     "format": "npm run format:package && npm run format:prettier && npm run format:code",

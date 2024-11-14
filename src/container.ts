@@ -1,11 +1,21 @@
 import type { ClassMethods, Constructor, Dependency, Replace } from './types';
 
+import { counter } from './injectable';
+
+function isClass(v: Dependency): boolean {
+  return typeof v === 'function' && /^\s*class\s+/.test(v.toString());
+}
+
 export class Container<T extends Dependency> {
   _dependencies: InstanceType<Dependency>[] = [];
   _replaces: Replace[] = [];
   _root: T;
 
   constructor(root: T) {
+    if (!isClass(root)) {
+      throw new Error('The Container supports class only');
+    }
+
     const diId = Reflect.getMetadata('injectableId', root);
 
     if (typeof diId !== 'number') {
@@ -19,17 +29,20 @@ export class Container<T extends Dependency> {
 
   _build(deps: Dependency[]): this {
     deps.map((target) => {
-      const injectableId = Reflect.getMetadata('injectableId', target);
+      const injectableId =
+        typeof Reflect.getMetadata('injectableId', target) === 'number'
+          ? Reflect.getMetadata('injectableId', target)
+          : counter();
 
-      if (typeof injectableId !== 'number') return;
-
-      // get the typeof parameters of constructor
       const paramTypes = Reflect.getMetadata('design:paramtypes', target) || [];
-      // resolve dependencies of current dependency
+
       const childrenDep = paramTypes.map((paramType: Dependency): InstanceType<Dependency> | undefined => {
-        const injectableId = Reflect.getMetadata('injectableId', paramType);
+        const injectableId =
+          typeof Reflect.getMetadata('injectableId', paramType) === 'number'
+            ? Reflect.getMetadata('injectableId', paramType)
+            : counter();
         const needToReplace = this._replaces.find((d) => d.from === injectableId);
-        // recursively resolve all child dependencies:
+
         this._build([needToReplace ? needToReplace.cls : paramType]);
 
         if (!this._dependencies[needToReplace ? needToReplace.to : injectableId]) {
@@ -42,7 +55,7 @@ export class Container<T extends Dependency> {
       });
 
       const needToReplace = this._replaces.find((d) => d.from === injectableId);
-      // resolve dependency by injection child classes that already resolved
+
       if (!this._dependencies[needToReplace ? needToReplace.to : injectableId]) {
         this._dependencies[needToReplace ? needToReplace.to : injectableId] = needToReplace
           ? new needToReplace.cls(...childrenDep)
@@ -58,7 +71,9 @@ export class Container<T extends Dependency> {
       throw new Error('Need mount class before resolve');
     }
 
-    this._build([this._root]);
+    if (!isClass(this._root)) {
+      throw new Error('The Container supports class only');
+    }
 
     const diId = Reflect.getMetadata('injectableId', this._root);
 
@@ -66,13 +81,33 @@ export class Container<T extends Dependency> {
       throw new Error('The root class must use @Injectable() decorator');
     }
 
+    this._build([this._root]);
+
     const dep = this._dependencies[diId];
+
+    this._replaces = [];
 
     if (!dep) {
       throw new Error(`Dependency ${diId} not found`);
     }
 
     return dep as never as InstanceType<T>;
+  }
+
+  public get<T extends Dependency>(cls: T): InstanceType<T> {
+    const diId = Reflect.getMetadata('injectableId', cls);
+
+    if (typeof diId !== 'number') {
+      throw new Error('Provided class must use @Injectable() decorator');
+    }
+
+    const dep = this._dependencies[diId];
+
+    if (!dep) {
+      throw new Error(`Dependency ${diId} is not found`);
+    }
+
+    return dep;
   }
 
   replace<
@@ -87,8 +122,12 @@ export class Container<T extends Dependency> {
     const injectableIdFrom = Reflect.getMetadata('injectableId', from);
     const injectableIdTo = Reflect.getMetadata('injectableId', to);
 
-    if (typeof injectableIdFrom !== 'number') return this;
-    if (typeof injectableIdTo !== 'number') return this;
+    if (typeof injectableIdFrom !== 'number') {
+      throw new Error('The first argument must be a class with @Injectable() decorator');
+    }
+    if (typeof injectableIdTo !== 'number') {
+      throw new Error('The second argument must be a class with @Injectable() decorator');
+    }
 
     this._replaces.push({
       cls: to,

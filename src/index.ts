@@ -1,3 +1,3 @@
 export * from './container';
-export * from './injectable';
+export { Injectable } from './injectable';
 export * from './types';

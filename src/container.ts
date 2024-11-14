@@ -3,7 +3,7 @@ import type { ClassMethods, Constructor, Dependency, Replace } from './types';
 import { counter } from './injectable';
 
 function isClass(v: Dependency): boolean {
-  return typeof v === 'function' && /^\s*class\s+/.test(v.toString());
+  return typeof v === 'function' && /^\s*class/.test(v.toString());
 }
 
 export class Container<T extends Dependency> {

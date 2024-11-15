@@ -161,7 +161,7 @@ node --loader ts-node/esm index.ts
 
 ### Interfaces Dependency
 
-**friendly-di** is not support interface as a dependency. Please use classes:
+**friendly-di** does not support interface as a dependency. Please use classes:
 
 *Wrong*
 
@@ -205,7 +205,7 @@ class OrderService {
 
 If you use projects like Angular, NestJS... I congratulate you! You don't need **friendly-di**, as there is already a great and very similar DI system there.
 
-[Inversify](https://github.com/inversify/InversifyJS/tree/master) - The most popular IoC Container library in JS.The
+[Inversify](https://github.com/inversify/InversifyJS/tree/master) - The most popular IoC Container library in JS. The
 downside is that you'll have to write a lot of boilerplate code. It has a large number of features that may be specific
 to large projects.
 

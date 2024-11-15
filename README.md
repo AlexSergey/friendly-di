@@ -161,7 +161,7 @@ node --loader ts-node/esm index.ts
 
 ### Interfaces Dependency
 
-**friendly-di** is not support interface as a dependency. Please use classes:
+**friendly-di** does not support interface as a dependency. Please use classes:
 
 *Wrong*
 

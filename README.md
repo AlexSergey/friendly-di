@@ -2,15 +2,19 @@
   <img alt="Friendly DI" src="https://www.natrube.net/friendly-di/friendly-di.png">
 </p>
 
+[![Version](https://img.shields.io/npm/v/friendly-di.svg?color=rgb(237,18,182)&labelColor=26272b)](https://www.npmjs.com/package/friendly-di)
+[![GitHub License](https://img.shields.io/badge/license-MIT-232428.svg?color=rgb(237,18,182)&labelColor=26272b)](https://www.npmjs.com/package/friendly-di)
+
 **Friendly DI** is light and fast Inversion Of Control Container based on Reflect metadata inspired by Angular and Nest DI systems.
 
 **Friendly DI** is very versatile tool. You can use it in Node.js projects (express, koa, whatever), in the Browser (pure JS projects, React projects etc.).
 
 **Benefits:**
 
-- 2kb size without dependencies
-- Works the same in the Browser and Node.js
-- Very simple API
+- **Small size**: Just 2 KB with no external dependencies.
+- **Cross-platform**: Works seamlessly in both the browser and Node.js environments.
+- **Simple API**: Intuitive and easy to use, with minimal configuration.
+- **MIT License**: Open-source with permissive licensing.
 
 ***
 
@@ -27,6 +31,11 @@ replace one of the dependencies, it is enough for the declare dependency with th
 - Classes are linked via interfaces
 - IoC Container registers dependencies
 - When a class is extracted from a container, it will have all declared or substituted dependencies
+
+If you wanna deep dive into Dependency Injection vs Dependency Inversion principle vs Inversion Of Control etc please
+reach the link with article:
+
+[Mastering the Dependency Inversion Principle: Best Practices for Clean Code with DI](https://dev.to/alexsergey/mastering-the-dependency-inversion-principle-best-practices-for-clean-code-with-di-5c0k)
 
 ## Usage
 
@@ -60,6 +69,10 @@ It is recommended to containerize the root of your application to comply with th
 to avoid the [service locator](https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/) anti-pattern.
 In this example *class App* is our composition root.
 
+<p align="center">
+  <img alt="Friendly DI Diagram" src="https://www.natrube.net/friendly-di/4.png">
+</p>
+
 ```ts
 import 'reflect-metadata';
 import { Injectable, Container } from 'friendly-di';
@@ -82,7 +95,7 @@ class OrderService {
 }
 
 @Injectable()
-export class UserService {
+class UserService {
   constructor(private orderService: OrderService) {
   }
 
@@ -93,7 +106,7 @@ export class UserService {
 
 
 @Injectable()
-export class App {
+class App {
   constructor(private userService: UserService) {
   }
 

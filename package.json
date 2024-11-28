@@ -1,6 +1,6 @@
 {
   "name": "friendly-di",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Friendly DI is light and fast Inversion Of Control Container based on Reflect metadata inspired by Angular and Nest DI systems.",
   "keywords": [
     "nestjs",

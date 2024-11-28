@@ -1,5 +1,7 @@
 import type { Dependency } from './types';
 
+import { _injectableId } from './constants';
+
 export const counter = (
   (c) => () =>
     c++
@@ -7,6 +9,6 @@ export const counter = (
 
 export function Injectable(): (target: Dependency) => void {
   return function (target: Dependency): void {
-    Reflect.defineMetadata('injectableId', counter(), target);
+    Reflect.defineMetadata(_injectableId, counter(), target);
   };
 }

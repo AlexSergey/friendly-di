@@ -1,5 +1,6 @@
 import type { ClassMethods, Constructor, Dependency, Replace } from './types';
 
+import { _injectableId } from './constants';
 import { counter } from './injectable';
 
 function isClass(v: Dependency): boolean {
@@ -30,16 +31,16 @@ export class Container<T extends Dependency> {
   _build(deps: Dependency[]): this {
     deps.map((target) => {
       const injectableId =
-        typeof Reflect.getMetadata('injectableId', target) === 'number'
-          ? Reflect.getMetadata('injectableId', target)
+        typeof Reflect.getMetadata(_injectableId, target) === 'number'
+          ? Reflect.getMetadata(_injectableId, target)
           : counter();
 
       const paramTypes = Reflect.getMetadata('design:paramtypes', target) || [];
 
       const childrenDep = paramTypes.map((paramType: Dependency): InstanceType<Dependency> | undefined => {
         const injectableId =
-          typeof Reflect.getMetadata('injectableId', paramType) === 'number'
-            ? Reflect.getMetadata('injectableId', paramType)
+          typeof Reflect.getMetadata(_injectableId, paramType) === 'number'
+            ? Reflect.getMetadata(_injectableId, paramType)
             : counter();
         const needToReplace = this._replaces.find((d) => d.from === injectableId);
 
@@ -75,7 +76,7 @@ export class Container<T extends Dependency> {
       throw new Error('The Container supports class only');
     }
 
-    const diId = Reflect.getMetadata('injectableId', this._root);
+    const diId = Reflect.getMetadata(_injectableId, this._root);
 
     if (typeof diId !== 'number') {
       throw new Error('The root class must use @Injectable() decorator');
@@ -95,7 +96,7 @@ export class Container<T extends Dependency> {
   }
 
   public get<T extends Dependency>(cls: T): InstanceType<T> {
-    const diId = Reflect.getMetadata('injectableId', cls);
+    const diId = Reflect.getMetadata(_injectableId, cls);
 
     if (typeof diId !== 'number') {
       throw new Error('Provided class must use @Injectable() decorator');
@@ -119,8 +120,8 @@ export class Container<T extends Dependency> {
         : T1[K];
     },
   >(from: Constructor<T1>, to: Constructor<T2>): this {
-    const injectableIdFrom = Reflect.getMetadata('injectableId', from);
-    const injectableIdTo = Reflect.getMetadata('injectableId', to);
+    const injectableIdFrom = Reflect.getMetadata(_injectableId, from);
+    const injectableIdTo = Reflect.getMetadata(_injectableId, to);
 
     if (typeof injectableIdFrom !== 'number') {
       throw new Error('The first argument must be a class with @Injectable() decorator');
